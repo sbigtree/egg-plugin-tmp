@@ -1,0 +1,18 @@
+{
+  "extends": "@eggjs/tsconfig",
+  "compilerOptions": {
+    "declaration": false,
+    "paths": {
+      "@/module/*": ["app/module/*"],
+      "@/*":["./*"],
+      "@app*":["app/*"]
+    },
+    "baseUrl": ".",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+  }
+}
