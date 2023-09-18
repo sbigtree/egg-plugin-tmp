@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 import 'egg';
-import ExportTmp from '../../../app/controller/tmp';
+import ExportTmp from '@appcontroller/tmp/v1/tmp';
 
 declare module 'egg' {
   interface IController {

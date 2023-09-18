@@ -31,11 +31,11 @@ const plugin: EggPlugin = {
   },
   routeAuth: {
     enable: true,
-    package: 'egg-route-auth',
+    package: '@sbigtree/egg-route-auth',
   },
   sequelize: {
     enable: true,
-    package: 'egg-plugin-sequelize',
+    package: '@sbigtree/egg-plugin-sequelize',
   },
 };
 
