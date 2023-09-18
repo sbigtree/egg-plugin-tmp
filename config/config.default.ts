@@ -4,8 +4,6 @@ import {Sequelize,models} from '@sbigtree/db-model';
 import initDB from '@sbigtree/db-model'
 
 
-
-
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
 
