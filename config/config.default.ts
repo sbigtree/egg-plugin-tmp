@@ -23,7 +23,7 @@ export default (appInfo: EggAppInfo) => {
   return {
     ...config,
     ...bizConfig,
-    auth: {
+    routeAuth: {
       secret_key: _config.secretKey
     },
     sequelize: {
