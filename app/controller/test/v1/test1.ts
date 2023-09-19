@@ -1,6 +1,7 @@
 import {Controller, Application} from 'egg'
 import {QueryTypes} from "sequelize";
 import {Sequelize, models, Models} from "@sbigtree/db-model";
+import {ResponseCode, ResponseModel} from "@applib/type/req_res";
 
 
 module.exports = class TmpController extends Controller {
@@ -19,10 +20,16 @@ module.exports = class TmpController extends Controller {
       plain: true
     })
 
-    this.ctx.body = user1.toJSON()
+    this.ctx.body = {
+      code: ResponseCode.OK,
+      data: 'ok'
+    } as ResponseModel
   }
 
   async auth() {
+    const params = this.ctx.request.body as {
+      user_id: number
+    }
     const app: any = this.app
     const sequelize: Sequelize = app.sequelize.default.client
     // 获取表模型
@@ -36,7 +43,10 @@ module.exports = class TmpController extends Controller {
       plain: true
     })
 
-    this.ctx.body = user1.id
+    this.ctx.body = {
+      code: ResponseCode.OK,
+      data: user1.id
+    } as ResponseModel
   }
 }
 
