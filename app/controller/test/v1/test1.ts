@@ -36,7 +36,7 @@ module.exports = class TmpController extends Controller {
       plain: true
     })
 
-    this.ctx.body = user1.toJSON()
+    this.ctx.body = user1.id
   }
 }
 
