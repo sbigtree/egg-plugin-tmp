@@ -5,7 +5,7 @@
     "paths": {
       "@/module/*": ["app/module/*"],
       "@/*":["./*"],
-      "@app*":["app/*"]
+      "@app/*":["app/*"]
     },
     "baseUrl": ".",
     "noUnusedLocals": false,

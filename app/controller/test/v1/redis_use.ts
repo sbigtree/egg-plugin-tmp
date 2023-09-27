@@ -1,7 +1,7 @@
 import {Controller} from "egg";
 import redis from '@app/redis'
 import {RedisKeys} from '@app/redis/keys'
-import logger from "@applogger";
+import logger from "@app/logger";
 
 
 module.exports = class TmpRedisController extends Controller {

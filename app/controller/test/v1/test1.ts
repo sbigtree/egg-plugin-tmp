@@ -1,7 +1,7 @@
 import {Controller, Application} from 'egg'
 import {QueryTypes} from "sequelize";
 import {Sequelize, models, Models} from "@sbigtree/db-model";
-import {ResponseCode, ResponseModel} from "@applib/type/req_res";
+import {ResponseCode, ResponseModel} from "@app/lib/type/req_res";
 
 
 module.exports = class TmpController extends Controller {
