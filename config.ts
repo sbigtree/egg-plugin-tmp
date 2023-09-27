@@ -34,7 +34,7 @@ interface Config {
 
 export default {
   name: 'tmp', // 当前应用模块名称
-  logPath: process.env.LOG_PATH ?? path.join(__dirname,'logs'), // 日志目录
+  logPath: process.env.LOG_PATH ?? path.join(process.cwd(),'logs'), // 日志目录
   aesKey: process.env.AES_CRYPT_KEY,
   secretKey: process.env.SECRET_KEY ?? '0123456789abcdef',
   db: {

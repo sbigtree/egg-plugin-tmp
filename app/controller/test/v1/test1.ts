@@ -11,7 +11,15 @@ module.exports = class TmpController extends Controller {
     const sequelize: Sequelize = app.sequelize.default.client
     // 获取表模型
     const models: Models = app.sequelize.default.models
-    models.UserTable
+    let s = await models.UserTable.update({
+      remark: '181*****',
+    }, {
+      returning: false,
+      where: {
+        id: 1
+      }
+    })
+
     let user1 = await models.UserTable.findOne()
 
     // 执行原生sql
@@ -22,7 +30,7 @@ module.exports = class TmpController extends Controller {
 
     this.ctx.body = {
       code: ResponseCode.OK,
-      data: 'ok'
+      data: user1.remark
     } as ResponseModel
   }
 
