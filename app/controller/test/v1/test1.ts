@@ -39,11 +39,18 @@ module.exports = class TmpController extends Controller {
       user_id: number
     }
     const app: any = this.app
+    const user = this.ctx.user // {user_id:1}
+
     const sequelize: Sequelize = app.sequelize.default.client
     // 获取表模型
     const models: Models = app.sequelize.default.models
     models.UserTable
-    let user1 = await models.UserTable.findOne()
+    let user1 = await models.UserTable.findOne({
+      rejectOnEmpty: false,
+      where: {
+        id: user.user_id
+      }
+    })
 
     // 执行原生sql
     const user2 = await sequelize.query('select * from user limit 1 offset 0', {
