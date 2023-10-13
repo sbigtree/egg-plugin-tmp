@@ -27,6 +27,7 @@
     "clean": "tsc -b --clean"
   },
   "dependencies": {
+    "@doctormckay/stdlib": "^2.8.1",
     "@eggjs/tegg": "^3.5.2",
     "@eggjs/tegg-aop-plugin": "^3.5.2",
     "@eggjs/tegg-config": "^3.2.3",

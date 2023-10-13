@@ -1,4 +1,5 @@
 import {Controller, Application} from 'egg'
+import init from "./app/index";
 
 const assert = require('assert');
 
@@ -8,7 +9,7 @@ module.exports = async (app:Application) => {
   // const index = app.config.coreMiddleware.indexOf('bodyParser');
   // assert(index >= 0, 'bodyParser 中间件必须存在');
   app.config.coreMiddleware.push('router');
-  await init()
+  await init(app)
   app.beforeStart(async () => {
 
   })
