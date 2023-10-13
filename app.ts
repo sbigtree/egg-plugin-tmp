@@ -8,5 +8,8 @@ module.exports = async (app:Application) => {
   // const index = app.config.coreMiddleware.indexOf('bodyParser');
   // assert(index >= 0, 'bodyParser 中间件必须存在');
   app.config.coreMiddleware.push('router');
+  await init()
+  app.beforeStart(async () => {
 
+  })
 }
