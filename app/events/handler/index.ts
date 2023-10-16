@@ -1,2 +1,2 @@
-export {TaskTest} from "@app/events/handler/TaskTest";
+export {TaskTest} from "./TaskTest";
 
