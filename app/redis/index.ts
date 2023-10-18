@@ -1,10 +1,11 @@
 import {createClient, RedisClientType} from 'redis';
 import config from "../../config";
-import logger from "@app/logger";
+import logger from "../logger";
 
 
 class RedisClient {
   public client: RedisClientType;
+  public subscriber: RedisClientType;
   private SubscribeOn: boolean;
   private channelCallbacks: object;
 
@@ -21,6 +22,7 @@ class RedisClient {
     })
     this.client.on('reconnecting', err => {
       logger.warn(`redis reconnecting ${host}:${port}/${db}`)
+      this.subscriber?.disconnect()
       this._initSubscribe()
 
     })
@@ -49,6 +51,7 @@ class RedisClient {
   async subscribe(channel, callback) {
     if (!this.channelCallbacks[channel]) {
       const subscriber = this.client.duplicate();
+      this.subscriber = subscriber
       await subscriber.connect()
       subscriber.subscribe(channel, (message, channel) => {
         callback()
