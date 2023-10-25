@@ -1,3 +1,4 @@
+import redis from "@app/redis";
 import {Controller, Application} from 'egg'
 import init from "./app/index";
 
@@ -9,6 +10,7 @@ module.exports = async (app:Application) => {
   // const index = app.config.coreMiddleware.indexOf('bodyParser');
   // assert(index >= 0, 'bodyParser 中间件必须存在');
   app.config.coreMiddleware.push('router');
+  await redis.master.ready()
   await init(app)
   app.beforeStart(async () => {
 
