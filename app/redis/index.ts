@@ -27,7 +27,9 @@ class RedisClient extends EventEmitter {
       logger.info(`redis connect ${host}:${port}/${db}`, this.client.isReady, this.client.isOpen,)
       this.ready(true)
     })
-
+    this.client.on('error', err => {
+      logger.info(`redis error ${host}:${port}/${db}`, this.client.isReady, this.client.isOpen,)
+    })
     this.client.on('reconnecting', err => {
 
       logger.warn(`redis reconnecting ${host}:${port}/${db}`, this.client.isReady, this.client.isOpen, Object.keys(this.channelCallbacks))
@@ -38,13 +40,12 @@ class RedisClient extends EventEmitter {
 
 
     })
-    this.client.on('error', err => {
-      console.log(err)
-      setTimeout(() => {
-        // this.client.connect()
-        // this._initSubscribe()
-      }, 3000)
-    });
+    // this.client.on('error', err => {
+    //   // setTimeout(() => {
+    //   //   // this.client.connect()
+    //   //   // this._initSubscribe()
+    //   // }, 3000)
+    // });
 
   }
 
@@ -94,33 +95,47 @@ class RedisClient extends EventEmitter {
 
   async _initSubscribe() {
     this.subscriber?.disconnect().catch(() => null)
-    const subscriber = this.client.duplicate();
-    this.subscriber = subscriber
-    await subscriber.connect()
-    logger.warn(`redis subscriber init connected `, subscriber.isReady, subscriber.isOpen, Object.keys(this.channelCallbacks))
+    // const subscriber = this.client.duplicate();
+    this.subscriber = null
+
+    // subscriber.on('error', err => {
+    //   logger.info(`_initSubscribe redis error `, err, subscriber.isOpen)
+    // })
+    // await subscriber.connect()
+    // logger.warn(`redis subscriber init connected `, subscriber.isReady, subscriber.isOpen, Object.keys(this.channelCallbacks))
 
     Object.keys(this.channelCallbacks).map(async (channel) => {
 
       const callback = this.channelCallbacks[channel]
       logger.warn(`redis re subscriber`, channel)
-      subscriber.subscribe(channel, (message, channel) => {
-        callback(message, channel)
-      })
+      this.subscriber.subscribe(channel, callback)
     })
   }
 
   async subscribe(channel, callback) {
-
     if (!this.channelCallbacks[channel]) {
       if (!this.subscriber?.isOpen) {
         const subscriber = this.client.duplicate();
         this.subscriber = subscriber
+        subscriber.on('error', err => {
+          logger.info(`redis subscriber  error `, subscriber.isOpen, err)
+        })
+        subscriber.on('connect', () => {
+          logger.info(`redis subscriber connect `, subscriber.isOpen)
+        })
+        subscriber.on('reconnecting', () => {
+          logger.info(`redis subscriber reconnecting `, subscriber.isOpen)
+        })
+        subscriber.on('ready', () => {
+          logger.info(`redis subscriber ready `, subscriber.isOpen)
+        })
+        subscriber.on('close', () => {
+          logger.info(`redis subscriber close `, subscriber.isOpen)
+        })
+        await subscriber.connect()
       }
-
-
-      const subscriber = this.subscriber
-      await subscriber.connect()
-      subscriber.subscribe(channel, (message, channel) => {
+      // const subscriber = this.subscriber
+      this.subscriber.subscribe(channel, (message, channel) => {
         callback()
       })
     }
@@ -167,6 +182,23 @@ class RedisClient extends EventEmitter {
     return res as number
   }
 
+  async counter(key, name, step = 1) {
+    // hmap {account:0}
+    let script = `
+    local step=tonumber(ARGV[2])
+    if redis.call("exists",KEYS[1]) == 0 then
+        redis.call("hset",KEYS[1],ARGV[1],step)
+        return ARGV[2]
+    else
+       return redis.call("hincrby",KEYS[1],ARGV[1],step)
+    end 
+    `
+    let res = await this.client.eval(script, {arguments: [name, step.toString()], keys: [key]})
+    // let res = await this.client.evalRo(script, {arguments: [name, step], keys: [key]})
+
+    // @ts-ignore
+    return res as number
+  }
 }
 
 
