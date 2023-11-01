@@ -136,7 +136,7 @@ class RedisClient extends EventEmitter {
       }
       // const subscriber = this.subscriber
       this.subscriber.subscribe(channel, (message, channel) => {
-        callback()
+        callback(message,channel)
       })
     }
     this.channelCallbacks[channel] = callback

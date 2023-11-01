@@ -35,6 +35,7 @@
     "@eggjs/tegg-eventbus-plugin": "^3.5.2",
     "@eggjs/tegg-plugin": "^3.5.2",
     "@eggjs/tegg-schedule-plugin": "^3.5.2",
+    "@elastic/elasticsearch": "^8.10.0",
     "@sbigtree/db-model": "^1.0.0-rc.41",
     "@sbigtree/egg-plugin-sequelize": "^1.0.0-rc.8",
     "@sbigtree/egg-route-auth": "^1.0.0-rc.17",

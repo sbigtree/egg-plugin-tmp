@@ -7,6 +7,10 @@ interface MysqlConfig {
   port: number,
   database: string,
 }
+interface EsConfig {
+  node: string,
+  apiKey: string,
+}
 
 interface RedisConfig {
   password: string,
@@ -23,6 +27,9 @@ interface Config {
   db: {
     [key: string]: MysqlConfig
   },
+  es: {
+    [key: string]: EsConfig
+  },
   redis: {
     [key: string]: RedisConfig
 
@@ -34,7 +41,7 @@ interface Config {
 
 export default {
   name: 'tmp', // 当前应用模块名称
-  logPath: process.env.LOG_PATH ?? path.join(process.cwd(),'logs'), // 日志目录
+  logPath: process.env.LOG_PATH ?? path.join(process.cwd(), 'logs'), // 日志目录
   aesKey: process.env.AES_CRYPT_KEY,
   secretKey: process.env.SECRET_KEY ?? '0123456789abcdef',
   db: {
@@ -44,6 +51,12 @@ export default {
       database: process.env.DB_NAME ?? 'steam_busi',
       host: process.env.DB_HOST ?? '127.0.0.1',
       port: process.env.DB_PORT ?? '3306',
+    }
+  },
+  es: {
+    master: {
+      node: process.env.ES_NODE,
+      apiKey: process.env.ES_APIKEY
     }
   },
   redis: {
