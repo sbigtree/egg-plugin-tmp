@@ -1,6 +1,6 @@
 import {EggAppConfig, EggAppInfo, PowerPartial} from 'egg';
 import _config from "../config";
-import {Sequelize,models} from '@sbigtree/db-model';
+import {Sequelize, models} from '@sbigtree/db-model';
 import initDB from '@sbigtree/db-model'
 
 
@@ -30,12 +30,13 @@ export default (appInfo: EggAppInfo) => {
       Sequelize: Sequelize,
       initDB: initDB,
       models: models,
-      test:'2',
+      test: '2',
       database: _config.db.default.database,
       host: _config.db.default.host,
       port: _config.db.default.port,
       username: _config.db.default.username,
       password: _config.db.default.password,
+      logging: process.env.NODE_ENV == 'development'
     },
   };
 };
