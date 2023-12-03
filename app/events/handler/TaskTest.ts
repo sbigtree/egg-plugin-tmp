@@ -22,5 +22,5 @@ export async function TaskTest(app, data: Params): Promise<{
   const sequelize: Sequelize = app.sequelize.default.client
   // 获取表模型
   const models: Models = app.sequelize.default.models
-
+  return
 }
