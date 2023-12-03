@@ -38,6 +38,13 @@ module.exports = class TmpController extends Controller {
     const params = this.ctx.request.body as {
       user_id: number
     }
+
+    this.ctx.validate({
+      steam_aid: {type: 'int', required: true},
+      receiver_steam_url: {type: 'string', required: true},
+      point_ids: {type: 'array', required: true, itemType: 'int'},
+    })
+
     const app: any = this.app
     const user = this.ctx.user // {user_id:1}
 
