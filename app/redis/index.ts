@@ -136,7 +136,7 @@ class RedisClient extends EventEmitter {
       }
       // const subscriber = this.subscriber
       this.subscriber.subscribe(channel, (message, channel) => {
-        callback(message,channel)
+        callback()
       })
     }
     this.channelCallbacks[channel] = callback
@@ -181,7 +181,6 @@ class RedisClient extends EventEmitter {
     // @ts-ignore
     return res as number
   }
-
   async counter(key, name, step = 1) {
     // hmap {account:0}
     let script = `
@@ -199,6 +198,9 @@ class RedisClient extends EventEmitter {
     // @ts-ignore
     return res as number
   }
+
+
+
 }
 
 
