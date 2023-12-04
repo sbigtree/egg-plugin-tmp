@@ -29,6 +29,10 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-tracer',
   },
+  validate: {
+    enable: true,
+    package: 'egg-validate',
+  },
   routeAuth: {
     enable: true,
     package: '@sbigtree/egg-route-auth',
