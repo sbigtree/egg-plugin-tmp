@@ -1,18 +1,29 @@
 {
   "extends": "@eggjs/tsconfig",
   "compilerOptions": {
-    "declaration": false,
     "paths": {
       "@/module/*": ["app/module/*"],
       "@/*":["./*"],
       "@app/*":["app/*"]
     },
     "baseUrl": ".",
+    "allowUnreachableCode": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "inlineSourceMap": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "strictPropertyInitialization": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
     "strictFunctionTypes": false,
+    "noImplicitReturns": false
   }
 }

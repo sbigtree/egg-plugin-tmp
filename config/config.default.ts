@@ -25,6 +25,10 @@ export default (appInfo: EggAppInfo) => {
   return {
     ...config,
     ...bizConfig,
+    validate: {
+      convert: true,
+      // validateRoot: false,
+    },
     routeAuth: {
       secret_key: _config.secretKey
     },
