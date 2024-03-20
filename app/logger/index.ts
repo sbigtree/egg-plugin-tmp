@@ -91,6 +91,7 @@ function registerLog(name) {
     pattern: "yyyy-MM-dd.log",
     alwaysIncludePattern: true,
     backups: 50,
+    daysToKeep: 30,
     filename: path.join(logPath, 'log'),
     layout: {
       type: 'pattern',
