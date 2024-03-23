@@ -20,6 +20,14 @@ export default (appInfo: EggAppInfo) => {
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
   };
+  // @ts-ignore
+  config.logger = {
+    appLogName: `app-web.log`,
+    coreLogName: 'egg-web.log',
+    agentLogName: 'egg-agent.log',
+    errorLogName: 'common-error.log',
+    dir: _config.logPath
+  }
 
   // the return config will combines to EggAppConfig
   return {
