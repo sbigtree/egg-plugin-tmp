@@ -115,6 +115,9 @@ export function getLogger(name = 'default', configure?): Logger {
 
 const logger = getLogger()
 
+export const Log = {
+  default: getLogger(LogName.default),
+}
 // process.on('unhandledRejection', err => {
 //   logger.error(err)
 //
