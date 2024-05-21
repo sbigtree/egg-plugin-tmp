@@ -37,6 +37,15 @@ export default (appInfo: EggAppInfo) => {
       convert: true,
       // validateRoot: false,
     },
+    multipart: {
+      mode: 'file',
+      fieldSize: '20mb',
+      fileSize: '20mb',
+      fields: 50,
+      files: 50,
+      allowArrayField: true,
+      fileExtensions: ['.apk', '.txt']
+    },
     routeAuth: {
       secret_key: _config.secretKey
     },
