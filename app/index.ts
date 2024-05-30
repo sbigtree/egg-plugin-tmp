@@ -9,28 +9,29 @@ import taskStore from "@app/store/taskStore";
 
 
 async function taskRun(app, message: string, channel, cb = null) {
-  const store = taskStore.get()
-
-  if (store.maxWorker > 100) return // 并发数大于100
-
-
-  // 当前进程
-  let _data = await redis.master.client.lPop(RedisKeys.TmpTaskTestQueue as any)
-  if (!_data) return
-  let data = JSON.parse(_data) as ChannelData
-  const handler: (data, a: any) => Promise<any> = EventHandler[data.key]
-  if (handler) {
+  (async () => {
+    const store = taskStore.get()
     taskStore.add('runningWorker') // 全局worker
-    taskStore.add(data.key) // 任务计数
-    await handler(app, data).catch(err => {
-      logger.error(err)
-    }).finally(() => {
-    })
+    if (store.runningWorker > 500) return // 并发数大于100
+    // 当前进程
+    let _data = await redis.master.client.lPop(RedisKeys.TmpTaskTestQueue as any)
+    if (!_data) return
+    let data = JSON.parse(_data) as ChannelData
+    const handler: (data, a: any) => Promise<any> = EventHandler[data.key]
+    if (handler) {
+      taskStore.add(data.key) // 任务计数
+      await handler(app, data).catch(err => {
+        logger.error(err)
+      }).finally(() => {
+      })
+      taskStore.add(data.key, -1)
+    } else {
+      logger.info('找不到任务', data.key)
+    }
+  })().finally(() => {
     taskStore.add('runningWorker', -1)
-    taskStore.add(data.key, -1)
-  } else {
-    logger.info('找不到任务', data.key)
-  }
+  })
+
 }
 
 let ready = false
