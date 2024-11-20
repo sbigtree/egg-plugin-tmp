@@ -41,17 +41,17 @@ export default async function init(app) {
   ready = true
   const len = await redis.master.client.lLen(RedisKeys.TmpTaskTestQueue as any) || 0
   logger.info('任务数', len)
-  const queue = new AsyncQueue(async (i: any, callback) => {
-    taskRun(app, '', '').finally(() => {
-    }).finally(callback)
-  }, 500)
+
 
   setInterval(async () => {
+    const queue = new AsyncQueue(async (i: any, callback) => {
+      taskRun(app, '', '').finally(() => {
+      }).finally(callback)
+    }, 500)
     const len = await redis.master.client.lLen(RedisKeys.TmpTaskTestQueue as any) || 0
     // logger.info('队列数', len)
     const store = taskStore.get()
-    // logger.info(`process ${process.pid} 当前进行中任务数`, store)
-
+    logger.info(`process ${process.pid} 当前进行中任务数`, store)
     for (let i = 0; i < len; i++) {
       queue.push(i)
     }

@@ -24,8 +24,8 @@ const logConfig = {
   appenders: {
     default: {
       type: "dateFile",
-      maxLogSize: '10M',
-      backups: 30,
+      maxLogSize: '50M',
+      backups: 100,
       pattern: "yyyy-MM-dd.log",
       filename: path.join(logPathDir, 'log'),
       alwaysIncludePattern: true,
@@ -36,8 +36,8 @@ const logConfig = {
     },
     error: {
       type: "dateFile",
-      maxLogSize: '10M',
-      backups: 10,
+      maxLogSize: '50M',
+      backups: 100,
       pattern: "yyyy-MM-dd.log",
       filename: path.join(config.logPath, 'error.log'),
       layout: {
@@ -87,10 +87,10 @@ function registerLog(name) {
   const appender = {}
   appender[name] = {
     type: "dateFile",
-    maxLogSize: '10M',
+    maxLogSize: '50M',
     pattern: "yyyy-MM-dd.log",
     alwaysIncludePattern: true,
-    backups: 50,
+    backups: 100,
     daysToKeep: 30,
     filename: path.join(logPath, 'log'),
     layout: {

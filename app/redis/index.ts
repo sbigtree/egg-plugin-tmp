@@ -136,7 +136,7 @@ class RedisClient extends EventEmitter {
       }
       // const subscriber = this.subscriber
       this.subscriber.subscribe(channel, (message, channel) => {
-        callback(message,channel)
+        callback(message, channel)
       })
     }
     this.channelCallbacks[channel] = callback
@@ -182,26 +182,58 @@ class RedisClient extends EventEmitter {
     return res as number
   }
 
-  async counter(key, name, step = 1) {
+  async counter(key, name, step = 1,expire=-1) {
     // hmap {account:0}
     let script = `
     local step=tonumber(ARGV[2])
+    local ex=tonumber(ARGV[3])
     if redis.call("exists",KEYS[1]) == 0 then
         redis.call("hset",KEYS[1],ARGV[1],step)
+        if ex >0 then
+          redis.call("expire",KEYS[1],ex)
+        end  
+          
         return ARGV[2]
     else
        return redis.call("hincrby",KEYS[1],ARGV[1],step)
     end 
     `
-    let res = await this.client.eval(script, {arguments: [name, step.toString()], keys: [key]})
+    let res = await this.client.eval(script, {arguments: [name, step.toString(),expire.toString()], keys: [key]})
     // let res = await this.client.evalRo(script, {arguments: [name, step], keys: [key]})
 
     // @ts-ignore
     return res as number
   }
+
+  // 批量取队列
+  async lRangePop(key, len): Promise<string[]> {
+    let script = `
+    local key = KEYS[1]
+    local count = tonumber(ARGV[1])
+    local elements = {}
+
+    for i = 1, count do
+      local element = redis.call('LPOP', key)
+      if not element then
+        break
+      end
+      table.insert(elements, element)
+    end
+
+    return elements
+    `
+    let res = await this.client.eval(script, {arguments: [len.toString()], keys: [key]})
+    return res as string[]
+
+  }
+
+  // 高效缓存
+
+
 }
 
 
 export default {
-  master: new RedisClient(config.redis.master.host, config.redis.master.port, config.redis.master.password, config.redis.master.db)
+  master: new RedisClient(config.redis.master.host, config.redis.master.port, config.redis.master.password, config.redis.master.db),
+  proxy_pool: new RedisClient(config.redis.master.host, config.redis.master.port, config.redis.master.password,'2')
 }

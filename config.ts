@@ -34,8 +34,8 @@ interface Config {
     [key: string]: RedisConfig
 
   },
-  steamClientHost: string,
-  serverHost: string
+  yymSuperProxy: string,
+  yymApiHost: string
 }
 
 
@@ -73,8 +73,8 @@ export default {
       db: 2,
     },
   },
-  steamClientHost: process.env.STEAM_CLIENT_HOST ?? '127.0.0.1:3006',
-  serverHost: process.env.SERVER_HOST ?? '127.0.0.1:8088'
+  yymSuperProxy: process.env.YYM_SUPER_PROXY ?? '127.0.0.1:11080',
+  yymApiHost: process.env.YYM_API_HOST ?? '127.0.0.1:6001',
 
 
 } as unknown as Config
