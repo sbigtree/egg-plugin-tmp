@@ -19,3 +19,7 @@ app/**/*.map
 test/**/*.map
 config/**/*.map
 !script/**
+
+typings/
+
+package-lock.json

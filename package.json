@@ -47,7 +47,8 @@
     "itsdangerjs": "^0.0.1",
     "log4js": "^6.9.1",
     "redis": "^4.6.9",
-    "sequelize": "^6.33.0"
+    "sequelize": "^6.33.0",
+    "tracer": "^1.3.0"
   },
   "devDependencies": {
     "@eggjs/tsconfig": "1",

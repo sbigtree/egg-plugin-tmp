@@ -2,7 +2,9 @@ import path from "path";
 import config from "../../config";
 import log4js, {Logger} from "log4js";
 import {LogName} from "./name";
+import {Tracer} from "tracer";
 
+const tracer = require('tracer');
 const fs = require('fs');
 //
 // const Logger = require('egg-logger').Logger;
@@ -31,8 +33,11 @@ const logConfig = {
       alwaysIncludePattern: true,
       layout: {
         type: 'pattern',
-        pattern: '%[[%d] [%p] [%f{2}:%l] %m'
-      }
+        // pattern: '%[[%d{yyyy-MM-dd hh.mm.ss}] [%p] [%f{4}:%l] %m',
+        pattern: '%[[%d{yyyy-MM-dd hh.mm.ss}] [%p] %m',
+      },
+      // layout: { type: 'custom' }
+
     },
     error: {
       type: "dateFile",
@@ -42,8 +47,13 @@ const logConfig = {
       filename: path.join(config.logPath, 'error.log'),
       layout: {
         type: 'pattern',
-        pattern: '%[[%d] [%p] [%f{4}:%l] %m'
-      }
+        // pattern: '%[[%d{yyyy-MM-dd hh.mm.ss}] [%p] [%f{4}:%l] %m',
+        pattern: '%[[%d{yyyy-MM-dd hh.mm.ss}] [%p] %m',
+
+      },
+      // layout: { type: 'custom' },
+
+
     },
     "just-errors": {
       type: "logLevelFilter",
@@ -55,8 +65,10 @@ const logConfig = {
       level: "debug",
       layout: {
         type: 'pattern',
-        pattern: '%[[%d] [%p] [%f{4}:%l]  %F %m'
-      }
+        pattern: '%[[%d{yyyy-MM-dd hh.mm.ss}] [%p] %m',
+
+      },
+      // layout: { type: 'custom' }
     },
   },
   categories: {
@@ -68,12 +80,12 @@ const logConfig = {
       },
   },
 }
+
+
 const logStore = {}
 
-// 注册日志
-registerLog(LogName.default)
 
-log4js.configure(logConfig)
+
 
 function registerLog(name) {
   const logPath = path.join(logPathDir, name,)
@@ -103,14 +115,30 @@ function registerLog(name) {
 }
 
 
-export function getLogger(name = 'default', configure?): Logger {
+export function getLogger(name = 'default', configure?): Tracer.Logger<any> {
   // log4js.a
   const logger = log4js.getLogger(name);
   logger.debug(name, 'login register', name); // only output to stdout
-  return logger
-
+  const logger2 = tracer.colorConsole({
+    format: "{{path}}:{{line}} {{message}}",
+    dateformat: "isoDateTime",
+    preprocess: function (data) {
+      data.title = data.title.toUpperCase();
+    },
+    transport: function (data) {
+      logger[data.title.toLowerCase()](data.output);
+      // logger.error(data.output);
+    }
+  });
+  return logger2
 
 }
+
+// 注册日志
+registerLog(LogName.default)
+
+log4js.configure(logConfig)
+
 
 
 const logger = getLogger()
