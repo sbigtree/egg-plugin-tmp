@@ -1,26 +1,63 @@
+import config from "@/config";
+import {HttpClient} from "@doctormckay/stdlib/http";
+import {Models} from "@sbigtree/db-model";
+import {Sequelize} from "sequelize";
 import {ChannelData} from "@app/type";
-
-import {Op, QueryTypes} from "sequelize";
-import {AsyncQueue} from "@doctormckay/stdlib/data_structures";
-import moment from "moment";
-import logger from "@app/logger";
-import redis from "@app/redis";
+import redis from "@/app/redis";
 import {RedisKeys} from "@app/redis/keys";
-import {Models, Sequelize} from "@sbigtree/db-model";
+import {Log} from "@app/logger";
 
 interface Params extends ChannelData {
-  data: {
-    steam_aid: number
+  data: {}
+}
+
+
+class Worker {
+  private app: any;
+  private params: Params;
+  protected sequelize: Sequelize
+  protected models: Models
+  protected session: HttpClient
+  private serviceId: any;
+  private playWalletUrl: string;
+
+  constructor(app, params: Params) {
+    this.app = app
+    this.params = params
+    this.sequelize = app.sequelize.default.client
+    // 获取表模型
+    this.models = app.sequelize.default.models
+    this.serviceId = ''
+    this.session = new HttpClient({
+      defaultHeaders: {}
+    })
+  }
+
+  get logId() {
+    return ''
+  }
+
+  async unlock() {
+    await redis.master.unlock(RedisKeys.TmpUserCache, process.pid.toString())
+  }
+
+  async main() {
+
   }
 }
 
-export async function TaskTest(app, data: Params): Promise<{
-  success: boolean,
-  data?: any,
-  message?: string
-}> {
+export async function OrderCheck(app, params: Params) {
   const sequelize: Sequelize = app.sequelize.default.client
   // 获取表模型
   const models: Models = app.sequelize.default.models
-  return
+
+  const task = new Worker(app, params)
+  return task.main().then(res => {
+
+  }).catch(err => {
+    Log.default.error(err)
+    task.unlock()
+    throw err
+  })
+
 }
