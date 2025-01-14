@@ -46,7 +46,7 @@ class Worker {
   }
 }
 
-export async function OrderCheck(app, params: Params) {
+export async function TaskTest(app, params: Params) {
   const sequelize: Sequelize = app.sequelize.default.client
   // 获取表模型
   const models: Models = app.sequelize.default.models
