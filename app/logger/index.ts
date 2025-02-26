@@ -136,6 +136,8 @@ export function getLogger(name = 'default', configure?): Tracer.Logger<any> {
 
 // 注册日志
 registerLog(LogName.default)
+registerLog(LogName.task)
+registerLog(LogName.redis)
 
 log4js.configure(logConfig)
 
@@ -145,6 +147,8 @@ const logger = getLogger()
 
 export const Log = {
   default: getLogger(LogName.default),
+  task: getLogger(LogName.task),
+  redis: getLogger(LogName.redis),
 }
 // process.on('unhandledRejection', err => {
 //   logger.error(err)

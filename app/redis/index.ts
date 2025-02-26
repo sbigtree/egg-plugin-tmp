@@ -1,7 +1,7 @@
-import { createClient, RedisClientType } from 'redis';
+import {createClient, RedisClientType} from 'redis';
 import config from "../../config";
-import logger from "../logger";
-import { EventEmitter } from "events";
+import logger, {Log} from "../logger";
+import {EventEmitter} from "events";
 
 class RedisClient extends EventEmitter {
   public client: RedisClientType;
@@ -20,11 +20,10 @@ class RedisClient extends EventEmitter {
 
     this.client = createClient({
       url: `redis://:${password}@${host}:${port}/${db}`,
-      connectTimeout: 5000,  // 设置连接超时（5秒）
     });
 
     this.client.on('connect', () => {
-      logger.info(`Redis connected: ${host}:${port}/${db}`, {
+      Log.redis.info(process.pid, `Redis connected: ${host}:${port}/${db}`, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
       });
@@ -32,7 +31,7 @@ class RedisClient extends EventEmitter {
     });
 
     this.client.on('error', (err) => {
-      logger.error(`Redis error: ${host}:${port}/${db}`, {
+      Log.redis.error(process.pid, `Redis error: ${host}:${port}/${db}`, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
         error: err,
@@ -40,15 +39,16 @@ class RedisClient extends EventEmitter {
     });
 
     this.client.on('reconnecting', () => {
-      logger.warn(`Redis reconnecting: ${host}:${port}/${db}`, {
+      Log.redis.warn(process.pid, `Redis reconnecting: ${host}:${port}/${db}`, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
         subscribedChannels: Object.keys(this.channelCallbacks),
       });
-      this._reSubscribeChannels(); // 重新订阅所有频道
+      this.ready(true);
+      this._initSubscribe(); // 重新订阅所有频道
     });
     this.client.on('end', () => {
-      logger.warn('Redis connection closed');
+      Log.redis.warn(process.pid, 'Redis connection closed');
     });
 
     this._init();
@@ -58,10 +58,12 @@ class RedisClient extends EventEmitter {
     this.client.connect();
   }
 
-  ready(flag:boolean,): Promise<void> {
+  ready(flag?: boolean): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if(flag){
+      if (flag) {
         this._ready = flag
+        const callback = this._readyCallbacks.shift()
+        if (callback) callback()
       }
       if (this._ready) {
         resolve();
@@ -90,6 +92,24 @@ class RedisClient extends EventEmitter {
     }
   }
 
+  async _initSubscribe() {
+    this.subscriber?.disconnect().catch(() => null)
+    // const subscriber = this.client.duplicate();
+    this.subscriber = null
+
+    // subscriber.on('error', err => {
+    //   logger.info(`_initSubscribe redis error `, err, subscriber.isOpen)
+    // })
+    // await subscriber.connect()
+    // logger.warn(`redis subscriber init connected `, subscriber.isReady, subscriber.isOpen, Object.keys(this.channelCallbacks))
+
+    Object.keys(this.channelCallbacks).map(async (channel) => {
+      const callback = this.channelCallbacks[channel]
+      logger.warn(process.pid, `redis re subscriber`, channel)
+      this.subscriber?.subscribe(channel, callback)
+    })
+  }
+
   async subscribe(channel: string, callback: (message: string, channel: string) => void) {
     if (!this.channelCallbacks[channel]) {
       if (!this.subscriber?.isOpen) {
@@ -97,24 +117,24 @@ class RedisClient extends EventEmitter {
         this.subscriber = subscriber;
 
         subscriber.on('error', (err) => {
-          logger.error(`Redis subscriber error:`, err);
+          Log.redis.error(process.pid, `Redis subscriber error:`, err);
         });
 
         subscriber.on('connect', () => {
-          logger.info(`Redis subscriber connected`);
+          Log.redis.info(process.pid, `Redis subscriber connected`);
         });
 
         subscriber.on('reconnecting', () => {
-          logger.warn(`Redis subscriber reconnecting`);
+          Log.redis.warn(process.pid, `Redis subscriber reconnecting`);
           this._reSubscribeChannels(); // 重新订阅所有频道
         });
 
         subscriber.on('ready', () => {
-          logger.info(`Redis subscriber ready`);
+          Log.redis.info(process.pid, `Redis subscriber ready`);
         });
 
         subscriber.on('close', () => {
-          logger.warn(`Redis subscriber closed`);
+          Log.redis.warn(process.pid, `Redis subscriber closed`);
         });
 
         await subscriber.connect();
@@ -126,7 +146,7 @@ class RedisClient extends EventEmitter {
     }
 
     this.channelCallbacks[channel] = callback;
-    logger.info(`Redis subscriber channels:`, Object.keys(this.channelCallbacks));
+    Log.redis.info(process.pid, `Redis subscriber channels:`, Object.keys(this.channelCallbacks));
   }
 
   /**
@@ -153,7 +173,7 @@ class RedisClient extends EventEmitter {
 
       return res as number;
     } catch (err) {
-      logger.error(`Redis lock error:`, err);
+      Log.redis.error(process.pid, `Redis lock error:`, err);
       throw err;
     }
   }
@@ -175,7 +195,7 @@ class RedisClient extends EventEmitter {
 
       return res as number;
     } catch (err) {
-      logger.error(`Redis unlock error:`, err);
+      Log.redis.error(process.pid, `Redis unlock error:`, err);
       throw err;
     }
   }
@@ -204,7 +224,7 @@ class RedisClient extends EventEmitter {
 
       return res as number;
     } catch (err) {
-      logger.error(`Redis counter error:`, err);
+      Log.redis.error(process.pid, `Redis counter error:`, err);
       throw err;
     }
   }

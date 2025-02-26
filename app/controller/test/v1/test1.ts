@@ -2,6 +2,9 @@ import {Controller, Application} from 'egg'
 import {QueryTypes} from "sequelize";
 import {Sequelize, models, Models} from "@sbigtree/db-model";
 import {ResponseCode, ResponseModel} from "@app/lib/type/req_res";
+import redis from "@app/redis";
+import {CHANNEL_KEY, RedisKeys} from "@app/redis/keys";
+import {EventKey} from "@app/events/keys";
 
 
 module.exports = class TmpController extends Controller {
@@ -68,6 +71,19 @@ module.exports = class TmpController extends Controller {
     this.ctx.body = {
       code: ResponseCode.OK,
       data: user1.id
+    } as ResponseModel
+  }
+
+  async addQueueTask(){
+    await redis.master.client.rPush(RedisKeys.TmpTaskTestQueue, JSON.stringify({
+      key: EventKey.TaskTest,
+      data: {
+        user_id: 1
+      }
+    }))
+    await redis.master.client.publish(CHANNEL_KEY, '{}')
+    this.ctx.body = {
+      code: ResponseCode.OK,
     } as ResponseModel
   }
 }

@@ -42,7 +42,7 @@ class Worker {
   }
 
   async main() {
-
+    Log.default.info('EventKey 测试任务')
   }
 }
 
