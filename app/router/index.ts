@@ -2,7 +2,7 @@ import {Router, Application} from "egg";
 
 module.exports = (app: Application) => {
 
-  const auth = app.middleware.routeAuth()
+  const auth = app.middleware.routeAuth({},app)
   const {router, controller} = app;
   // const apiRouter: Router = app.router.namespace('/api/tmp/');
   // 路由命名规范

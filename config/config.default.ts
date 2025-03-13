@@ -48,7 +48,11 @@ export default (appInfo: EggAppInfo) => {
       fileExtensions: ['.apk', '.txt']
     },
     routeAuth: {
-      secret_key: _config.secretKey
+      init: async () => {
+        return {
+          secret_key: _config.secretKey
+        }
+      }
     },
     sequelize: {
       Sequelize: Sequelize,

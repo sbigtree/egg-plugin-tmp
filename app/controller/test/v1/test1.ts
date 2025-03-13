@@ -43,15 +43,15 @@ module.exports = class TmpController extends Controller {
   }
 
   async auth() {
-    const params = this.ctx.request.body as {
-      user_id: number
+    const params = this.ctx.request.query as {
+      // user_id: string
     }
 
-    this.ctx.validate({
-      steam_aid: {type: 'int', required: true},
-      receiver_steam_url: {type: 'string', required: true},
-      point_ids: {type: 'array', required: true, itemType: 'int'},
-    })
+    // this.ctx.validate({
+    //   user_id: {type: 'int', required: true},
+    //   receiver_steam_url: {type: 'string', required: true},
+    //   point_ids: {type: 'array', required: true, itemType: 'int'},
+    // })
 
     const app: any = this.app
     const user = this.ctx.user // {user_id:1}
