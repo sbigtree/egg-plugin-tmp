@@ -49,6 +49,7 @@ export default (appInfo: EggAppInfo) => {
     },
     routeAuth: {
       init: async () => {
+        await nacos.ready()
         return {
           secret_key: _config.secretKey
         }
