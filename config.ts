@@ -16,7 +16,7 @@ interface EsConfig {
 interface RedisConfig {
   password: string,
   host: string,
-  port: number,
+  port: string,
   db: string,
 }
 
@@ -52,17 +52,17 @@ export default {
   namespace: process.env.NAMESPACE, // nacos 的配置命名空间  dev 开发 test  测试  prod 生产
   configAesKey: process.env.CONFIG_AES_KEY, // 解密nacos加密使用
   configId: process.env.NACOS_CONFIG_ID || 'public', // nacos 的配置id 默认去public
-  damainHost: process.env.DOMAIN_HOST || '127.0.0.1', // 服务器内网IP
+  damainHost: process.env.DOMAIN_HOST??'127.0.0.1' , // 服务器内网IP
   logPath: process.env.LOG_PATH ?? path.join(process.cwd(), 'logs'), // 日志目录
   aesKey: process.env.AES_CRYPT_KEY,
-  secretKey: process.env.SECRET_KEY ?? '0123456789abcdef',
+  secretKey: process.env.SECRET_KEY,
   db: {
     default: {
-      username: process.env.DB_USER ?? 'momo',
-      password: process.env.DB_PASSWORD ?? '%%%momo###',
-      database: process.env.DB_NAME ?? 'steam_busi',
-      host: process.env.DB_HOST ?? '127.0.0.1',
-      port: process.env.DB_PORT ?? '3306',
+      username: process.env.DB_USER ,
+      password: process.env.DB_PASSWORD ,
+      database: process.env.DB_NAME ,
+      host: process.env.DB_HOST ,
+      port: process.env.DB_PORT ,
     }
   },
   es: {
@@ -82,7 +82,7 @@ export default {
       password: process.env.REDIS_PASSWORD ?? 'tree',
       host: process.env.REDIS_HOST ?? '127.0.0.1',
       port: process.env.REDIS_PORT ?? '6379',
-      db: 2,
+      db: '2',
     },
   },
   yymSuperProxy: process.env.YYM_SUPER_PROXY ?? '127.0.0.1:11080',

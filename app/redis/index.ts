@@ -2,28 +2,42 @@ import {createClient, RedisClientType} from 'redis';
 import config from "../../config";
 import logger, {Log} from "../logger";
 import {EventEmitter} from "events";
+import Base from "sdk-base";
 
-class RedisClient extends EventEmitter {
+
+type GetConfig = () => { password: string, host: string, port: string, db: string }
+
+class RedisClient extends Base {
   public client: RedisClientType;
   public subscriber: RedisClientType;
   private channelCallbacks: Record<string, (message: string, channel: string) => void>;
   private _ready = false;
+  private _didInit = false; // 是否调用了init方法
   private _readyCallbacks: ((err?: Error) => void)[];
   private _readyError: Error | null;
+  private _getConfig: GetConfig;
 
-  constructor(host: string, port: string | number, password: string, db: string) {
+  constructor(getConfig: GetConfig) {
     super();
 
     this.channelCallbacks = {};
     this._readyCallbacks = [];
     this._readyError = null;
+    this._getConfig = getConfig;
 
+  }
+
+  private _init() {
+    if (this._didInit) return
+    this._didInit = true
+    const conf = this._getConfig()
+    const url = `redis://:${conf.password}@${conf.host}:${conf.port}/${conf.db}`
     this.client = createClient({
-      url: `redis://:${password}@${host}:${port}/${db}`,
+      url: url,
     });
 
     this.client.on('connect', () => {
-      Log.redis.info(process.pid, `Redis connected: ${host}:${port}/${db}`, {
+      Log.redis.info(process.pid, url, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
       });
@@ -31,7 +45,7 @@ class RedisClient extends EventEmitter {
     });
 
     this.client.on('error', (err) => {
-      Log.redis.error(process.pid, `Redis error: ${host}:${port}/${db}`, {
+      Log.redis.error(process.pid, `Redis error: ${url}`, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
         error: err,
@@ -39,7 +53,7 @@ class RedisClient extends EventEmitter {
     });
 
     this.client.on('reconnecting', () => {
-      Log.redis.warn(process.pid, `Redis reconnecting: ${host}:${port}/${db}`, {
+      Log.redis.warn(process.pid, `Redis reconnecting: ${url}`, {
         isReady: this.client.isReady,
         isOpen: this.client.isOpen,
         subscribedChannels: Object.keys(this.channelCallbacks),
@@ -50,35 +64,47 @@ class RedisClient extends EventEmitter {
     this.client.on('end', () => {
       Log.redis.warn(process.pid, 'Redis connection closed');
     });
-
-    this._init();
-  }
-
-  private _init() {
     this.client.connect();
   }
 
-  ready(flag?: boolean): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (flag) {
-        this._ready = flag
-        const callback = this._readyCallbacks.shift()
-        if (callback) callback()
-      }
-      if (this._ready) {
-        resolve();
-      } else if (this._readyError) {
-        reject(this._readyError);
-      } else {
-        this._readyCallbacks.push((err) => {
+  ready(flag?: any) {
+    if (arguments.length === 0) {
+      return new Promise<void>((resolve, reject) => {
+        if (this._ready) {
+          return resolve();
+        } else if (this._readyError) {
+          return reject(this._readyError);
+        }
+        this._readyCallbacks.push(err => {
           if (err) {
             reject(err);
           } else {
             resolve();
           }
         });
+        this._init()
+      });
+    } else if (typeof flag === 'function') {
+      this._readyCallbacks.push(flag);
+    } else if (flag instanceof Error) {
+      this._ready = false;
+      this._readyError = flag;
+      if (!this._readyCallbacks.length) {
+        this.emit('error', flag);
       }
-    });
+    } else {
+      this._ready = flag;
+    }
+
+    if (this._ready || this._readyError) {
+      this._readyCallbacks.splice(0, this._readyCallbacks.length).forEach(callback => {
+        process.nextTick(() => {
+          callback(this._readyError);
+        });
+      });
+    }
+
+
   }
 
   private _reSubscribeChannels() {
@@ -231,10 +257,12 @@ class RedisClient extends EventEmitter {
 }
 
 export default {
-  master: new RedisClient(
-    config.redis.master.host,
-    config.redis.master.port,
-    config.redis.master.password,
-    config.redis.master.db
-  ),
+  master: new RedisClient(() => {
+    return {
+      host: config.redis.master.host,
+      port: config.redis.master.port,
+      password: config.redis.master.password,
+      db: config.redis.master.db
+    }
+  }),
 };
