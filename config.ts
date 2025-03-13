@@ -24,6 +24,7 @@ interface Config {
   name: string,
   namespace: string,
   configId: string,
+  configAesKey: string,
   damainHost: string,
   logPath: string,
   aesKey: string,
@@ -49,6 +50,7 @@ interface Config {
 export default {
   name: 'tmp', // 当前应用模块名称
   namespace: process.env.NAMESPACE, // nacos 的配置命名空间  dev 开发 test  测试  prod 生产
+  configAesKey: process.env.CONFIG_AES_KEY, // 解密nacos加密使用
   configId: process.env.NACOS_CONFIG_ID || 'public', // nacos 的配置id 默认去public
   damainHost: process.env.DOMAIN_HOST || '127.0.0.1', // 服务器内网IP
   logPath: process.env.LOG_PATH ?? path.join(process.cwd(), 'logs'), // 日志目录

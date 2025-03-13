@@ -3,6 +3,7 @@ import {Log} from "@app/logger";
 import config from "@/config";   // ts
 import {Application} from 'egg'
 import Base from 'sdk-base'
+import {decryptAES} from "@sbigtree/db-model";
 
 const logger = Log.default as any;
 
@@ -12,7 +13,7 @@ class Nacos extends Base {
   private configClient: NacosConfigClient;
 
   constructor(options = {}) {
-    super(Object.assign({},  options, {initMethod: '_init'}));
+    super(Object.assign({}, options, {initMethod: '_init'}));
     this.nameClient = new NacosNamingClient({
       logger,
       serverList: config.nacosHost, // replace to real nacos serverList
@@ -34,29 +35,42 @@ class Nacos extends Base {
     await this.initConfig()
   }
 
+  getValue(value):any {
+    if(typeof value == 'string'){
+      const r = /^\{e\}(.*)/.exec(value)
+      if (r) {
+        const key = config.configAesKey
+        value = decryptAES(r[1], Buffer.from(key, 'base64'),'base64')
+        return value
+      }
+    }
+
+    return value
+  }
+
   async initConfig() {
 
     const res = await this.configClient.getConfig(config.configId, 'DEFAULT_GROUP')
     const c = JSON.parse(res)
-    config.aesKey = c.AES_CRYPT_KEY
-    config.secretKey = c.SECRET_KEY
-    config.db.default.username = c.DB_USER
-    config.db.default.password = c.DB_PASSWORD
-    config.db.default.database = c.DB_NAME
-    config.db.default.host = c.DB_HOST
-    config.db.default.port = c.DB_PORT
-    config.es.master.node = c.ES_NODE
-    config.es.master.apiKey = c.ES_APIKEY
-    config.redis.master.password = c.REDIS_PASSWORD
-    config.redis.master.host = c.REDIS_HOST
-    config.redis.master.port = c.REDIS_PORT
-    config.redis.master.db = c.REDIS_DB
-    config.redis.session.password = c.REDIS_PASSWORD
-    config.redis.session.host = c.REDIS_HOST
-    config.redis.session.port = c.REDIS_PORT
+    config.aesKey = this.getValue(c.AES_CRYPT_KEY)
+    config.secretKey = this.getValue(c.SECRET_KEY)
+    config.db.default.username = this.getValue(c.DB_USER)
+    config.db.default.password = this.getValue(c.DB_PASSWORD)
+    config.db.default.database = this.getValue(c.DB_NAME)
+    config.db.default.host = this.getValue(c.DB_HOST)
+    config.db.default.port = this.getValue(c.DB_PORT)
+    config.es.master.node = this.getValue(c.ES_NODE)
+    config.es.master.apiKey = this.getValue(c.ES_APIKEY)
+    config.redis.master.password = this.getValue(c.REDIS_PASSWORD)
+    config.redis.master.host = this.getValue(c.REDIS_HOST)
+    config.redis.master.port = this.getValue(c.REDIS_PORT)
+    config.redis.master.db = this.getValue(c.REDIS_DB)
+    config.redis.session.password = this.getValue(c.REDIS_PASSWORD)
+    config.redis.session.host = this.getValue(c.REDIS_HOST)
+    config.redis.session.port = this.getValue(c.REDIS_PORT)
     config.redis.session.db = '2'
-    config.yymSuperProxy = c.YYM_SUPER_PROXY
-    config.yymApiHost = c.YYM_API_HOST
+    config.yymSuperProxy = this.getValue(c.YYM_SUPER_PROXY)
+    config.yymApiHost = this.getValue(c.YYM_API_HOST)
   }
 
   async registerInstance(app) {
