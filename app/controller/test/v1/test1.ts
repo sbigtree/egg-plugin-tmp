@@ -5,6 +5,8 @@ import {ResponseCode, ResponseModel} from "@app/lib/type/req_res";
 import redis from "@app/redis";
 import {CHANNEL_KEY, RedisKeys} from "@app/redis/keys";
 import {EventKey} from "@app/events/keys";
+import {ESCsgoInventory} from "@sbigtree/db-model/dist/es_models/ESCsgoInventory";
+import esClient from "@app/db/es";
 
 
 module.exports = class TmpController extends Controller {
@@ -29,6 +31,9 @@ module.exports = class TmpController extends Controller {
     const user2 = await sequelize.query('select * from user limit 1 offset 0', {
       type: QueryTypes.SELECT,
       plain: true
+    })
+    const suites = await esClient.client.search({
+      index: ESCsgoInventory.index,
     })
 
     this.ctx.body = {

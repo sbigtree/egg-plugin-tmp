@@ -2,7 +2,7 @@ import redis from "@app/redis";
 import {Controller, Application} from 'egg'
 import init from "./app/index";
 import nacos from "./app/nacos";
-import {init as init_es} from "./app/db/es";
+import esClient from "./app/db/es";
 
 const assert = require('assert');
 
@@ -44,7 +44,7 @@ class AppBootHook {
     console.log('启动插件完成，准备初始化')
     this.app.config.coreMiddleware.push('router');
     await redis.master.ready()
-    await init_es()
+    await esClient.ready()
     await init(this.app)
   }
 

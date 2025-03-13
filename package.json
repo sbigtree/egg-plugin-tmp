@@ -36,7 +36,7 @@
     "@eggjs/tegg-plugin": "^3.5.2",
     "@eggjs/tegg-schedule-plugin": "^3.5.2",
     "@elastic/elasticsearch": "^8.10.0",
-    "@sbigtree/db-model": "^1.1.6-rc10",
+    "@sbigtree/db-model": "file:../db-model",
     "@sbigtree/egg-plugin-sequelize": "^1.1.0-rc.0",
     "@sbigtree/egg-route-auth": "^1.1.1-rc.1",
     "egg": "^3.15.0",
