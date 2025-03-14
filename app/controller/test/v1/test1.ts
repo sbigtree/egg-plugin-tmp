@@ -1,5 +1,5 @@
 import {Controller, Application} from 'egg'
-import {QueryTypes} from "sequelize";
+import {QueryTypes, Op} from "sequelize";
 import {Sequelize, models, Models} from "@sbigtree/db-model";
 import {ResponseCode, ResponseModel} from "@app/lib/type/req_res";
 import redis from "@app/redis";
@@ -66,6 +66,16 @@ module.exports = class TmpController extends Controller {
         id: user.user_id
       }
     })
+    let steam = await models.SteamAccountTable.findOne({
+      rejectOnEmpty: false,
+      where: {
+        id: user.user_id,
+        cookie: {
+          [Op.not]: null
+        },
+      }
+    })
+    const s = steam.cookie
 
     // 执行原生sql
     const user2 = await sequelize.query('select * from user limit 1 offset 0', {
@@ -79,7 +89,7 @@ module.exports = class TmpController extends Controller {
     } as ResponseModel
   }
 
-  async addQueueTask(){
+  async addQueueTask() {
     await redis.master.client.rPush(RedisKeys.TmpTaskTestQueue, JSON.stringify({
       key: EventKey.TaskTest,
       data: {
