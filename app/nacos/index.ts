@@ -1,5 +1,5 @@
 import {NacosConfigClient, NacosNamingClient} from 'nacos';
-import {Log} from "@app/logger";
+import {Log} from "../logger";
 import config from "@/config";   // ts
 import {Application} from 'egg'
 import Base from 'sdk-base'
