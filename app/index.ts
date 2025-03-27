@@ -100,7 +100,7 @@ export default async function init(app) {
     const store = taskStore.get()
     const ml = Math.max(Math.min(store.maxWorker - store.runningWorker, len), 0)
     Log.task.info(`process ${process.pid} 当前进行中任务数`, store, '剩余', ml)
-    for (let i = 0; i < ml; i++) {
+    for (let i = 0; i < 5000; i++) {
       queue.push(i)
     }
     subQueues.map(async qkey => {
