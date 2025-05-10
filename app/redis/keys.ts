@@ -4,10 +4,8 @@ export enum RedisKeys {
   // Tmp是模块名，UserCache是功能名，由开发者定义，_{user_id}为需要替换的字符
   // 使用：RedisKeys.TmpUserCache.replace('{user_id}',user.id) 获取key
   TmpUserCache = 'TmpUserCache_{user_id}',
-  TmpTaskTestQueue = 'TmpTaskTestQueue'
-
-
+  TmpTaskTestQueue = 'TmpTaskTestQueue',
+  SteamGiftAppealQueue = 'SteamGiftAppealQueue'
 }
 
-export const CHANNEL_KEY = 'TmpTaskChannel'
-
+export const CHANNEL_KEY = 'SteamGiftAppealChannel'
