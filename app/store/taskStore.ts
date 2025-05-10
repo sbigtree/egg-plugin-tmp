@@ -11,10 +11,10 @@ const store:TaskStore = {
 }
 
 function add(key = 'runningWorker', step = 1) {
-  if (store[key]==undefined||store[key]==null) {
-    store[key] = 0
-  }else {
+  if (store[key]>=0) {
     store[key] += step
+  }else{
+    store[key]=1
   }
 }
 
